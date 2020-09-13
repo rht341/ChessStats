@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -11,7 +13,7 @@ namespace ChessStats
     class Program
     {
         private const string chessComUrl = "https://api.chess.com/pub/player/rht609/stats";
-        private const string lichessUrl = "https://lichess.org/api/player/rht341";
+        private const string lichessUrl = "https://lichess.org/api/account";
 
           static async Task Main(string[] args)
         {
@@ -40,13 +42,17 @@ namespace ChessStats
                 dynamic stats = JObject.Parse(content);
 
                 string blitzRating = stats.chess_blitz.last.rating;
-                Console.WriteLine($"Rich's Chess.com blitz rating is {blitzRating}.");
+                Console.Write($"Rich's Chess.com blitz rating is {blitzRating}, ");
 
                 //lichess
 
-                content = await client.GetStringAsync(lichessUrl);
+                //content = await client.GetStringAsync(lichessUrl);
 
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "AvVVbU6yICi9FKvs");
+                content = await client.GetStringAsync(lichessUrl);
                 stats = JObject.Parse(content);
+                blitzRating = stats.perfs.blitz.rating;
+                Console.WriteLine($"lichess blitz rating is {blitzRating}.");
             }
 
         }
