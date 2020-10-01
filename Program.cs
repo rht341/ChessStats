@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 
 namespace ChessStats
 {
@@ -30,31 +31,48 @@ namespace ChessStats
             string blitzRating = stats.chess_blitz.last.rating;
             Console.WriteLine(blitzRating); */
 
-            using (var client = new HttpClient())
+        //     using (var client = new HttpClient())
+        //     {
+        //         // var result = await client.GetAsync(Url);
+        //         // Console.WriteLine(result.StatusCode);
+
+        //         // chess.com
+        //         var content = await client.GetStringAsync(chessComUrl);
+        //         // Console.WriteLine(content);
+
+        //         dynamic stats = JObject.Parse(content);
+
+        //         string blitzRating = stats.chess_blitz.last.rating;
+        //         Console.Write($"Rich's Chess.com blitz rating is {blitzRating}, ");
+
+        //         //lichess
+
+        //         //content = await client.GetStringAsync(lichessUrl);
+
+        //         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "AvVVbU6yICi9FKvs");
+        //         content = await client.GetStringAsync(lichessUrl);
+        //         stats = JObject.Parse(content);
+        //         blitzRating = stats.perfs.blitz.rating;
+        //         Console.WriteLine($"lichess blitz rating is {blitzRating}.");
+        //     }
+
+            RestClient client = new RestClient(chessComUrl);
+
+            RestRequest request = new RestRequest
             {
-                // var result = await client.GetAsync(Url);
-                // Console.WriteLine(result.StatusCode);
+                Method = Method.GET
+            };
 
-                // chess.com
-                var content = await client.GetStringAsync(chessComUrl);
-                // Console.WriteLine(content);
+            IRestResponse response = await client.ExecuteAsync(request);
 
-                dynamic stats = JObject.Parse(content);
+            // string content = response.Content.Substring(9, response.Content.Length-17);
+            string content = response.Content;
 
-                string blitzRating = stats.chess_blitz.last.rating;
-                Console.Write($"Rich's Chess.com blitz rating is {blitzRating}, ");
+            dynamic result = JObject.Parse(content);
 
-                //lichess
+            string blitzRating = result.chess_blitz.last.rating;
 
-                //content = await client.GetStringAsync(lichessUrl);
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "AvVVbU6yICi9FKvs");
-                content = await client.GetStringAsync(lichessUrl);
-                stats = JObject.Parse(content);
-                blitzRating = stats.perfs.blitz.rating;
-                Console.WriteLine($"lichess blitz rating is {blitzRating}.");
-            }
-
+            Console.WriteLine($"Rich's Chess.com blitz rating is {blitzRating}, ");
         }
         private string GetDebuggerDisplay()
         {
