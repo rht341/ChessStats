@@ -58,10 +58,9 @@ namespace ChessStats
 
             RestClient client = new RestClient(chessComUrl);
 
-            RestRequest request = new RestRequest
-            {
-                Method = Method.GET
-            };
+            RestRequest request = new RestRequest(RestSharp.Method.GET);
+            request.RequestFormat = RestSharp.DataFormat.Json;
+            request.AddHeader("Content-Type", "applicaton/json");
 
             IRestResponse response = await client.ExecuteAsync(request);
 
@@ -72,7 +71,18 @@ namespace ChessStats
 
             string blitzRating = result.chess_blitz.last.rating;
 
-            Console.WriteLine($"Rich's Chess.com blitz rating is {blitzRating}, ");
+            Console.Write($"Rich's Chess.com blitz rating is {blitzRating}, ");
+
+            client = new RestClient(lichessUrl);
+            request.AddHeader("Authorization", "Bearer AvVVbU6yICi9FKvs");
+
+            response = await client.ExecuteAsync(request);
+            content = response.Content;
+
+            result = JObject.Parse(content);
+            blitzRating = result.perfs.blitz.rating;
+
+            Console.WriteLine($"lichess blitz rating is {blitzRating}.");
         }
         private string GetDebuggerDisplay()
         {
